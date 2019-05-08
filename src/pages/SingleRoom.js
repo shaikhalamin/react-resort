@@ -1,0 +1,86 @@
+import React, { Component } from 'react';
+import defaultBcg from '../images/room-1.jpeg';
+import {RoomContext} from '../context';
+
+import Banner from '../components/Banner';
+import StyledHero from '../components/StyledHero'
+import {Link} from 'react-router-dom';
+
+export default class SingleRoom extends Component {
+
+  static contextType = RoomContext;
+
+  state = {
+    slug:this.props.match.params.slug,
+    defaultBcg
+  }
+
+  componentDidMount(){
+    //let {getRoom} = this.context;
+    //console.log(this.state.slug);
+   // console.log(getRoom);
+  }
+
+  render() {
+
+    let {getRoom} = this.context;
+    const slug = this.state.slug;
+    const room = getRoom(slug);
+
+    if(!room){
+      return (
+        <div className="error">
+          <h6>No Room Found !</h6>
+          <Link to='/rooms' className="btn-primary">Go Back</Link>
+        </div>
+      )
+    }
+
+    const {name,description,capacity,size,price,extras,breakfast,pets,images} = room;
+    const [mainImg,...defaultImages] = images;
+    //console.log(defaultImages);
+    return (
+      <>
+      <StyledHero img={mainImg}>
+        <Banner title={`${name} room`}>
+          <Link to='/rooms' className='btn-primary'>Back to rooms</Link>
+        </Banner>
+      </StyledHero>
+      <section className="single-room">
+        <div className="single-room-images">
+          {defaultImages.map((image,index)=>{
+            return <img key={index} src={image} alt={name}/>
+          })}
+        </div>
+        <div className="single-room-info">
+          <article className="desc">
+            <h3>details</h3>
+            <p>{description}</p>
+          </article>
+          <article className="info">
+            <h3>info</h3>
+            <h6>price  : {price}</h6>
+            <h6>size  : {size}SQFT</h6>
+            <h6>maxcapacity  : {
+              capacity > 1 ? `${capacity} people` : `${capacity} person`
+              }</h6>
+            <h6>{
+              pets ? "pets allowed" : "no pets allowed"
+              }</h6>
+              <h6>{breakfast && "free break fast included"}</h6>
+          </article>
+        </div>
+      </section>
+      <section className="room-extras">
+        <h6>extras</h6>
+        <ul className="extras">
+            {extras.map((extra,i)=>{
+              return <li key={i}>-{extra}</li>
+            })}
+        </ul>
+      </section>
+      </>
+    )
+  }
+}
+
